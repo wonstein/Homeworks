@@ -56,6 +56,23 @@ class Portfolio(object):
 				self.log.append(log_entry)
 				self.gatherAssets()
 				
+	def gatherAssets(self):
+		for i in range(0, len(self.stocks)):
+			if self.stocks[i][0] == 0:
+				self.stocks.pop(i)
+			for j in range(1, len(self.stocks)):
+				if self.stocks[i][1] == self.stocks[j][1]:
+					self.stocks[i][0] += self.stocks[j][0]
+					self.stocks.pop(j)
+		
+	def history(self):
+		print "Transaction History:"
+		for i in range(0, len(self.log)):
+			print "\t%d. %s" % (i+1, self.log[i])
+		
+	def __str__(self):
+		return "Portfolio Summary: \n\tCash: $%.2f \n\tStocks: %r \n\tMutual Funds: %r" % (self.cash, self.stocks, self.mutualfunds)
+				
 class Asset(object):
 	def __init__(self, symbol):
 		self.symbol = symbol
