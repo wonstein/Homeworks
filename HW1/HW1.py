@@ -76,20 +76,38 @@ def piglatin(txt):
   
   for word in words:
     pl_word = ''
-    if word[0] == 'a' or word[0] == 'e' or word[0] == 'o' or word[0] == 'u' or word[0] == 'i':
+    punctuation = ''
+	
+	# Checking for punctuation
+    if word[len(word)-1] in ['.', ',', ':', ';', '?', '!']:
+      punctuation = word[len(word)-1]
+      word = word[0:len(word)-1]
+		
+	# Words that begin with vowel
+    if word[0].lower() in ['a', 'e', 'i', 'o', 'u']:
 	  pl_word = word + 'way'
-    elif not(word[0] == 'a' or word[0] == 'e' or word[0] == 'o' or word[0] == 'u' or word[0] == 'i'):
+	  
+	# Words that begin with consonants
+    elif not(word[0].lower() in ['a', 'e', 'i', 'o', 'u']):
+	
 	  for letters in range(1, len(word)-1):
-	    if word[letters] in ['a', 'e', 'i', 'o', 'u']:
-		  if word[letters+1] in ['a', 'e', 'i', 'o', 'u']:
+	  
+		# Finding first vowel
+	    if word[letters].lower() in ['a', 'e', 'i', 'o', 'u']:
+		
+		  # Checking for second vowel
+		  if word[letters+1].lower in ['a', 'e', 'i', 'o', 'u']:
 		    pl_word = word[letters:len(word)] + word[0:letters] + 'ay'
 		    letters = len(word)
-		  elif not(word[letters+1] in ['a', 'e', 'i', 'o', 'u']):
+		  # If only one vowel
+		  elif not(word[letters+1].lower() in ['a', 'e', 'i', 'o', 'u']):
 			pl_word = word[letters:len(word)] + word[0:letters] + 'ay'
             letters = len(word)
   
-    new_sentence += pl_word + ' '
+    new_sentence += pl_word + punctuation + ' '
   
   return ''.join(new_sentence)
+  
+print piglatin("I am a bird now.")
   
 	
