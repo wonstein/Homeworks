@@ -47,7 +47,7 @@ class Portfolio(object):
 		elif isinstance(quantity, int) == False and isinstance(asset, Stock) == True:
 			print "Invalid transaction. Stocks must be sold whole."
 		else:
-			self.cash -= asset.getPrice() * quantity
+			self.withdrawCash(asset.getPrice() * quantity)
 			if isinstance(asset, Stock) == True:
 				asset_type = 'Stocks'
 				self.stocks.append([quantity, asset.getSymbol()])
@@ -74,9 +74,10 @@ class Portfolio(object):
 			print "Invalid transaction."
 		else: 
 			# Check if client owns shares of asset
-			if not(asset.getSymbol() in zip(*self.stocks)[1] or asset.getSymbol() in zip(*self.mutualfunds[1])):
+			if not(asset.getSymbol() in zip(*self.stocks)[1] or asset.getSymbol() in zip(*self.mutualfunds)[1]):
 				print "Invalid transaction. No shares of %s owned." % asset.getSymbol()
-			elif (self.stocks[zip(*self.stocks)[1].index(asset.getSymbol())][0] < quantity) or (self.mutualfunds[zip(*self.mutualfunds)[1].index(asset.getSymbol())][0] < quantity):
+			# Check if clients owns enough shares
+			elif (isinstance(asset, Stock) == True and self.stocks[zip(*self.stocks)[1].index(asset.getSymbol())][0] < quantity) or (isinstance(asset, MutualFund) == True and self.mutualfunds[zip(*self.mutualfunds)[1].index(asset.getSymbol())][0] < quantity):
 				print "Invalid transaction. Not enough shares of %s owned." % asset.getSymbol()
 			else:
 				if isinstance(asset, Stock) == True:
@@ -93,7 +94,7 @@ class Portfolio(object):
 					price_mod = random.uniform(0.9, 1.2)
 					self.mutualfunds[zip(*self.mutualfunds)[1].index(asset.getSymbol())][0] -= quantity
 				sellprice = asset.getPrice() * price_mod
-				self.cash += sellprice * quantity
+				self.addCash(sellprice * quantity)
 				if quantity == 1:
 					multiple = ''
 				else:
@@ -101,6 +102,12 @@ class Portfolio(object):
 				log_entry = "%s sold: %.1f share%s of %s at $%.2f per share" % (asset_type, quantity, multiple, asset.getSymbol(), sellprice)
 				self.log.append(log_entry)
 		self.gatherAssets()
+		
+	def sellStock(self, quantity, asset):
+		self.sellAsset(quantity, asset)
+	
+	def sellMutualFund(self, quantity, asset):
+		self.sellAsset(quantity, asset)
 	
 class Asset(object):
 	def __init__(self, symbol):
@@ -127,10 +134,7 @@ p.addCash(500000)
 s = Stock(100, 'HAL')
 m = MutualFund('MAR')
 p.buyAsset(2, s)
+p.buyAsset(3.1, m)
 print p
-p.buyAsset(3.01029, m)
-print p
-p.history()
-p.sellAsset(3, s)
-p.history()
+p.sellAsset(4, m)
 print p
