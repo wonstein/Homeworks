@@ -40,40 +40,34 @@ class Portfolio(object):
 		
 	def getCash(self):
 		return self.cash
-		
-	def buyStock(self, quantity, stock):
-		if isinstance(quantity, int) == False or quantity <= 0:
-			print "Invalid transaction. Stocks must be sold whole."
-		else:
-			if stock.getPrice() * quantity > self.cash:
-				print "Invalid transaction. Not enough cash."
-			else:
-				self.cash -= stock.getPrice() * quantity
-				self.stocks.append([quantity, stock.getSymbol()])
-				if quantity == 1:
-					shares = 'share'
-				else: 
-					shares = 'shares'
-				log_entry = "Stock purchased: %d %s of %s." % (quantity, shares, stock.getSymbol())
-				self.log.append(log_entry)
-				self.gatherAssets()
 	
-	def buyMutualFund(self, quantity, mutualfund):
+	def buyAsset(self, quantity, asset):
 		if quantity <= 0:
 			print "Invalid transaction."
+		elif isinstance(quantity, int) == False and isinstance(asset, Stock) == True:
+			print "Invalid transaction. Stocks must be sold whole."
 		else:
-			if mutualfund.getPrice() * quantity > self.cash:
-				print "Invalid transaction. Not enough cash."
+			self.cash -= asset.getPrice() * quantity
+			if isinstance(asset, Stock) == True:
+				asset_type = 'Stocks'
+				self.stocks.append([quantity, asset.getSymbol()])
+			elif isinstance(asset, MutualFund):
+				asset_type = 'Mutual Fund'
+				self.mutualfunds.append([quantity, asset.getSymbol()])
+			if quantity == 1:
+				multiple = ''
 			else:
-				self.cash -= mutualfund.getPrice() * quantity
-				self.mutualfunds.append([quantity, mutualfund.getSymbol()])
-				if quantity == 1:
-					shares = 'share'
-				else: 
-					shares = 'shares'
-				log_entry = "Mutual funds purchased: %.1f %s of %s." % (quantity, shares, mutualfund.getSymbol())
-				self.log.append(log_entry)
-				self.gatherAssets()
+				multiple = 's'
+			log_entry = "%s purchased: %r share%s of %s." % (asset_type, quantity, multiple, asset.getSymbol())
+			self.log.append(log_entry)
+			self.gatherAssets()
+	
+	def buyStock(self, quantity, asset):
+		self.buyAsset(quantity, asset)
+		
+	def buyMutualFund(self, quantity, asset):
+		self.buyAsset(quantity, asset)
+				
 	
 	def sellStock(self, quantity, stock):
 		if isinstance(quantity, int) == False or quantity <= 0:
@@ -99,7 +93,6 @@ class Portfolio(object):
 					log_entry = "Stock sold: %d %s of %s at $%.2f per share" % (quantity, shares, stock.getSymbol(), sellprice)
 					self.log.append(log_entry)
 		self.gatherAssets()
-				
 	
 class Asset(object):
 	def __init__(self, symbol):
@@ -120,4 +113,13 @@ class MutualFund(Asset):
 	def __init__(self, symbol):
 		self.symbol = symbol
 		self.price = 1
-	
+
+p = Portfolio('folio')
+p.addCash(500000)
+s = Stock(100, 'HAL')
+m = MutualFund('MAR')
+p.buyAsset(2, s)
+print p
+p.buyAsset(3.01029, m)
+print p
+p.history()
