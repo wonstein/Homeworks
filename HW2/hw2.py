@@ -1,3 +1,5 @@
+import random
+
 class Portfolio(object):
 	def __init__(self, name):
 		self.name = name
@@ -5,7 +7,24 @@ class Portfolio(object):
 		self.stocks = []
 		self.mutualfunds = []
 		self.log = []
+	
+	def history(self):
+		print "Transaction History:"
+		for i in range(0, len(self.log)):
+			print "\t%d. %s" % (i+1, self.log[i])
 		
+	def __str__(self):
+		return "Portfolio Summary: \n\tCash: $%.2f \n\tStocks: %r \n\tMutual Funds: %r" % (self.cash, self.stocks, self.mutualfunds)
+					
+	def gatherAssets(self):
+		for i in range(0, len(self.stocks)):
+			if self.stocks[i][0] == 0:
+				self.stocks.pop(i)
+			for j in range(1, len(self.stocks)):
+				if self.stocks[i][1] == self.stocks[j][1]:
+					self.stocks[i][0] += self.stocks[j][0]
+					self.stocks.pop(j)
+			
 	def addCash(self, amount):
 		if isinstance(amount, float) == False and isinstance(amount, int) == False:
 			print "Invalid value."
@@ -55,24 +74,33 @@ class Portfolio(object):
 				log_entry = "Mutual funds purchased: %.1f %s of %s." % (quantity, shares, mutualfund.getSymbol())
 				self.log.append(log_entry)
 				self.gatherAssets()
+	
+	def sellStock(self, quantity, stock):
+		if isinstance(quantity, int) == False or quantity <= 0:
+			print "Invalid transaction. Stocks must be sold whole."
+		else:
+			# Check if client owns any shares of stock
+			if not(stock.getSymbol() in zip(*self.stocks)[1]):
+				print "Invalid transaction. No stock owned."
+			
+			# Check if client owns sufficient quantity of stock
+			else:
+				if self.stocks[zip(*self.stocks)[1].index(stock.getSymbol())][0] < quantity:
+					print "Invalid transaction. Not enough stock owned."		
+				else:
+					# Generate random selling price 
+					sellprice = stock.getPrice() * random.uniform(0.5, 1.5)
+					self.cash += sellprice * quantity
+					self.stocks[zip(*self.stocks)[1].index(stock.getSymbol())][0] -= quantity
+					if quantity == 1:
+						shares = 'share'
+					else:
+						shares = 'shares'
+					log_entry = "Stock sold: %d %s of %s at $%.2f per share" % (quantity, shares, stock.getSymbol(), sellprice)
+					self.log.append(log_entry)
+		self.gatherAssets()
 				
-	def gatherAssets(self):
-		for i in range(0, len(self.stocks)):
-			if self.stocks[i][0] == 0:
-				self.stocks.pop(i)
-			for j in range(1, len(self.stocks)):
-				if self.stocks[i][1] == self.stocks[j][1]:
-					self.stocks[i][0] += self.stocks[j][0]
-					self.stocks.pop(j)
-		
-	def history(self):
-		print "Transaction History:"
-		for i in range(0, len(self.log)):
-			print "\t%d. %s" % (i+1, self.log[i])
-		
-	def __str__(self):
-		return "Portfolio Summary: \n\tCash: $%.2f \n\tStocks: %r \n\tMutual Funds: %r" % (self.cash, self.stocks, self.mutualfunds)
-				
+	
 class Asset(object):
 	def __init__(self, symbol):
 		self.symbol = symbol
