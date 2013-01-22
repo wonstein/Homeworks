@@ -21,3 +21,37 @@ class Portfolio(object):
 		
 	def getCash(self):
 		return self.cash
+		
+	def buyStock(self, quantity, stock):
+		if isinstance(quantity, int) == False or quantity <= 0:
+			print "Invalid transaction. Stocks must be sold whole."
+		else:
+			if stock.getPrice() * quantity > self.cash:
+				print "Invalid transaction. Not enough cash."
+			else:
+				self.cash -= stock.getPrice() * quantity
+				self.stocks.append([quantity, stock.getSymbol()])
+				if quantity == 1:
+					shares = 'share'
+				else: 
+					shares = 'shares'
+				log_entry = "Stock purchased: %d %s of %s." % (quantity, shares, stock.getSymbol())
+				self.log.append(log_entry)
+				self.gatherAssets()
+	
+	def buyMutualFund(self, quantity, mutualfund):
+		if quantity <= 0:
+			print "Invalid transaction."
+		else:
+			if mutualfund.getPrice() * quantity > self.cash:
+				print "Invalid transaction. Not enough cash."
+			else:
+				self.cash -= mutualfund.getPrice() * quantity
+				self.mutualfunds.append([quantity, mutualfund.getSymbol()])
+				if quantity == 1:
+					shares = 'share'
+				else: 
+					shares = 'shares'
+				log_entry = "Mutual funds purchased: %.1f %s of %s." % (quantity, shares, mutualfund.getSymbol())
+				self.log.append(log_entry)
+				self.gatherAssets()
