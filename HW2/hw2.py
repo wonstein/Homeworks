@@ -52,13 +52,13 @@ class Portfolio(object):
 				asset_type = 'Stocks'
 				self.stocks.append([quantity, asset.getSymbol()])
 			elif isinstance(asset, MutualFund):
-				asset_type = 'Mutual Fund'
+				asset_type = 'Mutual funds'
 				self.mutualfunds.append([quantity, asset.getSymbol()])
 			if quantity == 1:
 				multiple = ''
 			else:
 				multiple = 's'
-			log_entry = "%s purchased: %r share%s of %s." % (asset_type, quantity, multiple, asset.getSymbol())
+			log_entry = "%s purchased: %.1f share%s of %s." % (asset_type, quantity, multiple, asset.getSymbol())
 			self.log.append(log_entry)
 			self.gatherAssets()
 	
@@ -68,30 +68,38 @@ class Portfolio(object):
 	def buyMutualFund(self, quantity, asset):
 		self.buyAsset(quantity, asset)
 				
-	
-	def sellStock(self, quantity, stock):
-		if isinstance(quantity, int) == False or quantity <= 0:
-			print "Invalid transaction. Stocks must be sold whole."
-		else:
-			# Check if client owns any shares of stock
-			if not(stock.getSymbol() in zip(*self.stocks)[1]):
-				print "Invalid transaction. No stock owned."
-			
-			# Check if client owns sufficient quantity of stock
+	def sellAsset(self, quantity, asset):
+		price_mod = 1
+		if quantity <= 0:
+			print "Invalid transaction."
+		else: 
+			# Check if client owns shares of asset
+			if not(asset.getSymbol() in zip(*self.stocks)[1] or asset.getSymbol() in zip(*self.mutualfunds[1])):
+				print "Invalid transaction. No shares of %s owned." % asset.getSymbol()
+			elif (self.stocks[zip(*self.stocks)[1].index(asset.getSymbol())][0] < quantity) or (self.mutualfunds[zip(*self.mutualfunds)[1].index(asset.getSymbol())][0] < quantity):
+				print "Invalid transaction. Not enough shares of %s owned." % asset.getSymbol()
 			else:
-				if self.stocks[zip(*self.stocks)[1].index(stock.getSymbol())][0] < quantity:
-					print "Invalid transaction. Not enough stock owned."		
+				if isinstance(asset, Stock) == True:
+					asset_type = 'Stocks'
+					if isinstance(quantity, int) == False:
+						print "Invalid transaction. Stocks must be sold whole."
+					else:		
+						# Generate price modifier
+						price_mod = random.uniform(0.5, 1.5)
+						self.stocks[zip(*self.stocks)[1].index(asset.getSymbol())][0] -= quantity
+				elif isinstance(asset, MutualFund) == True:
+					asset_type = 'Mutual funds'	
+					# Generate price modifier
+					price_mod = random.uniform(0.9, 1.2)
+					self.mutualfunds[zip(*self.mutualfunds)[1].index(asset.getSymbol())][0] -= quantity
+				sellprice = asset.getPrice() * price_mod
+				self.cash += sellprice * quantity
+				if quantity == 1:
+					multiple = ''
 				else:
-					# Generate random selling price 
-					sellprice = stock.getPrice() * random.uniform(0.5, 1.5)
-					self.cash += sellprice * quantity
-					self.stocks[zip(*self.stocks)[1].index(stock.getSymbol())][0] -= quantity
-					if quantity == 1:
-						shares = 'share'
-					else:
-						shares = 'shares'
-					log_entry = "Stock sold: %d %s of %s at $%.2f per share" % (quantity, shares, stock.getSymbol(), sellprice)
-					self.log.append(log_entry)
+					multiple = 's'
+				log_entry = "%s sold: %.1f share%s of %s at $%.2f per share" % (asset_type, quantity, multiple, asset.getSymbol(), sellprice)
+				self.log.append(log_entry)
 		self.gatherAssets()
 	
 class Asset(object):
@@ -123,3 +131,6 @@ print p
 p.buyAsset(3.01029, m)
 print p
 p.history()
+p.sellAsset(3, s)
+p.history()
+print p
