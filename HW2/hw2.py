@@ -55,3 +55,24 @@ class Portfolio(object):
 				log_entry = "Mutual funds purchased: %.1f %s of %s." % (quantity, shares, mutualfund.getSymbol())
 				self.log.append(log_entry)
 				self.gatherAssets()
+				
+class Asset(object):
+	def __init__(self, symbol):
+		self.symbol = symbol
+	
+	def getSymbol(self):
+		return self.symbol
+		
+	def getPrice(self):
+		return self.price
+		
+class Stock(Asset):
+	def __init__(self, price, symbol):
+		self.symbol = symbol
+		self.price = price
+		
+class MutualFund(Asset):
+	def __init__(self, symbol):
+		self.symbol = symbol
+		self.price = 1
+	
