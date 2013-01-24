@@ -14,6 +14,10 @@ class Portfolio(object):
 			print "\t%d. %s" % (i+1, self.log[i])
 		
 	def __str__(self):
+		summary_stocks = ''
+		#for i in range(0,len(self.stocks)):
+		#	summary_stocks = "%d shares of %s" % (self.stocks[0][0], self.stocks[0][1])
+		#return summary_stocks
 		return "Portfolio Summary: \n\tCash: $%.2f \n\tStocks: %r \n\tMutual Funds: %r" % (self.cash, self.stocks, self.mutualfunds)
 					
 	def gatherAssets(self):
@@ -31,9 +35,10 @@ class Portfolio(object):
 		else:
 			self.cash += amount
 			if amount >= 0:
-				print "Cash deposited: $%.2f" % amount
+				log_entry = "Cash deposited: $%.2f" % amount
 			elif amount < 0:
-				print "Cash withdrawn: $%.2f" % -amount
+				log_entry = "Cash withdrawn: $%.2f" % -amount
+			self.log.append(log_entry)
 	
 	def withdrawCash(self, amount):
 		self.addCash(-amount)
@@ -47,7 +52,7 @@ class Portfolio(object):
 		elif isinstance(quantity, int) == False and isinstance(asset, Stock) == True:
 			print "Invalid transaction. Stocks must be sold whole."
 		else:
-			self.withdrawCash(asset.getPrice() * quantity)
+			self.cash -= asset.getPrice() * quantity
 			if isinstance(asset, Stock) == True:
 				asset_type = 'Stocks'
 				self.stocks.append([quantity, asset.getSymbol()])
@@ -58,7 +63,7 @@ class Portfolio(object):
 				multiple = ''
 			else:
 				multiple = 's'
-			log_entry = "%s purchased: %.1f share%s of %s." % (asset_type, quantity, multiple, asset.getSymbol())
+			log_entry = "%s purchased: %r share%s of %s at $%.2f per share" % (asset_type, quantity, multiple, asset.getSymbol(), asset.getPrice())
 			self.log.append(log_entry)
 			self.gatherAssets()
 	
@@ -94,7 +99,7 @@ class Portfolio(object):
 					price_mod = random.uniform(0.9, 1.2)
 					self.mutualfunds[zip(*self.mutualfunds)[1].index(asset.getSymbol())][0] -= quantity
 				sellprice = asset.getPrice() * price_mod
-				self.addCash(sellprice * quantity)
+				self.cash += sellprice * quantity
 				if quantity == 1:
 					multiple = ''
 				else:
@@ -134,7 +139,8 @@ p.addCash(500000)
 s = Stock(100, 'HAL')
 m = MutualFund('MAR')
 p.buyAsset(2, s)
+p.buyAsset(3, s)
 p.buyAsset(3.1, m)
+p.sellAsset(2, m)
 print p
-p.sellAsset(4, m)
-print p
+p.history()
