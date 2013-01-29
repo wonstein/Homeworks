@@ -23,7 +23,7 @@ class Portfolio(object):
 		return "Portfolio Summary: \n\n\tCash: $%.2f \n\n\tStocks: %s \n\tMutual Funds: %s" % (self.cash, summary_stocks, summary_mutualfunds)
 					
 	def gatherAssets(self):
-		removeStocks = []
+		removeStocks = []	`
 		for i in range(0, len(self.stocks)):
 			if self.stocks[i][0] == 0:
 				self.stocks.pop(i)
