@@ -31,8 +31,8 @@ def comb_sort(unsorted, sorted):
     #if unsorted == sorted: print "Done!"
         
 def simulate(n, algorithm, sims):
-  sorted = range(1, n+1)
-  unsorted = range(1, n+1)
+  sorted = range(0, n)
+  unsorted = range(0, n)
   average_time = 0
   if algorithm == 'bubble':
     for i in range(0, sims):
@@ -46,4 +46,14 @@ def simulate(n, algorithm, sims):
       start_time = time.time()
       comb_sort(unsorted, sorted)
       average_time += (time.time() - start_time)/sims
-  print "Ran %s simulations, averaging %.4f seconds per sort" %(sims, average_time)    
+  print "Ran %s simulations, averaging %.4f seconds per sort" %(sims, average_time) 
+  return round(average_time, 4)
+  
+comb_averages = []
+bubble_averages = []
+for i in range(1, 15):
+  comb_averages.append(simulate(2**i, 'comb', 1000))
+  bubble_averages.appenD(simulate(2**i, 'bubble', 1000))
+print comb_averages
+print bubble_averages
+  
