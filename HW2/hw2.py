@@ -15,10 +15,12 @@ class Portfolio(object):
 		
 	def __str__(self):
 		summary_stocks = ''
-		#for i in range(0,len(self.stocks)):
-		#	summary_stocks = "%d shares of %s" % (self.stocks[0][0], self.stocks[0][1])
-		#return summary_stocks
-		return "Portfolio Summary: \n\tCash: $%.2f \n\tStocks: %r \n\tMutual Funds: %r" % (self.cash, self.stocks, self.mutualfunds)
+		summary_mutualfunds = ''
+		for i in range(0,len(self.stocks)):
+			summary_stocks += "%d shares of %s \n		" % (self.stocks[i][0], self.stocks[i][1])
+		for i in range(0,len(self.mutualfunds)):
+			summary_mutualfunds += "%d shares of %s \n		      " % (self.mutualfunds[i][0], self.mutualfunds[i][1])
+		return "Portfolio Summary: \n\n\tCash: $%.2f \n\n\tStocks: %s \n\tMutual Funds: %s" % (self.cash, summary_stocks, summary_mutualfunds)
 					
 	def gatherAssets(self):
 		removeStocks = []
@@ -151,12 +153,13 @@ class MutualFund(Asset):
 		self.symbol = symbol
 		self.price = 1
 
-#p = Portfolio('folio')
-#p.addCash(50000)
-#s = Stock(100, 'HAL')
-#s2 = Stock(50, 'BAR')
-#m = MutualFund('MAR')
-#p.buyAsset(2, s)
+p = Portfolio('folio')
+p.addCash(50000)
+s = Stock(100, 'HAL')
+s2 = Stock(50, 'BAR')
+m = MutualFund('MAR')
+m2 = MutualFund('MOP')
+p.buyAsset(2, s)
 #print p
 #p.buyAsset(15, s2)
 #print p
@@ -166,8 +169,9 @@ class MutualFund(Asset):
 #print p
 #p.gatherAssets()
 #print p
-#p.buyAsset(3.1, m)
-#print p
-#p.sellMutualFund(4.1, 'HAL')
-#print p
-#p.history()
+p.buyAsset(3.1, m)
+p.buyAsset(5.7, m2)
+print p
+p.sellMutualFund(4.1, 'HAL')
+print p
+p.history()
