@@ -60,10 +60,10 @@ class Portfolio(object):
 			self.cash -= asset.getPrice() * quantity
 			if isinstance(asset, Stock) == True:
 				asset_type = 'Stocks'
-				self.stocks.append([quantity, asset.getSymbol()])
+				self.stocks.append([quantity, asset.getSymbol(), asset.getPrice()])
 			elif isinstance(asset, MutualFund):
 				asset_type = 'Mutual funds'
-				self.mutualfunds.append([quantity, asset.getSymbol()])
+				self.mutualfunds.append([quantity, asset.getSymbol(), asset.getPrice()])
 			log_entry = "%s purchased: %r share(s) of %s at $%.2f per share" % (asset_type, quantity, asset.getSymbol(), asset.getPrice())
 			self.log.append(log_entry)
 		self.gatherAssets()
@@ -114,10 +114,22 @@ class Portfolio(object):
 		self.gatherAssets()
 		
 	def sellStock(self, quantity, asset):
-		self.sellAsset(quantity, asset)
+		if isinstance(asset, str) == True:
+			if asset in zip(*self.stocks)[1]:
+				self.sellAsset(quantity, Stock(zip(*self.stocks)[2][zip(*self.stocks)[1].index(asset)], asset))
+			else: 
+				print "Invalid transaction. %s is not a stock." % asset
+		else:
+			self.sellAsset(quantity, asset)
 	
 	def sellMutualFund(self, quantity, asset):
-		self.sellAsset(quantity, asset)
+		if isinstance(asset, str) == True:
+			if asset in zip(*self.mutualfunds)[1]:
+				self.sellAsset(quantity, MutualFund(asset))
+			else: 
+				print "Invalid transaction. %s is not a mutual fund." % asset
+		else:
+			self.sellAsset(quantity, asset)
 	
 class Asset(object):
 	def __init__(self, symbol):
@@ -139,22 +151,23 @@ class MutualFund(Asset):
 		self.symbol = symbol
 		self.price = 1
 
-p = Portfolio('folio')
-p.addCash(50000)
-s = Stock(100, 'HAL')
-s2 = Stock(50, 'BAR')
-m = MutualFund('MAR')
-p.buyAsset(2, s)
-print p
-p.buyAsset(15, s2)
-print p
-p.buyAsset(3, s)
-print p
-p.buyAsset(3, s2)
-print p
-p.gatherAssets()
-print p
-p.buyAsset(3.1, m)
-print p
-p.sellAsset(4, s2)
-print p
+#p = Portfolio('folio')
+#p.addCash(50000)
+#s = Stock(100, 'HAL')
+#s2 = Stock(50, 'BAR')
+#m = MutualFund('MAR')
+#p.buyAsset(2, s)
+#print p
+#p.buyAsset(15, s2)
+#print p
+#p.buyAsset(3, s)
+#print p
+#p.buyAsset(3, s2)
+#print p
+#p.gatherAssets()
+#print p
+#p.buyAsset(3.1, m)
+#print p
+#p.sellMutualFund(4.1, 'HAL')
+#print p
+#p.history()
