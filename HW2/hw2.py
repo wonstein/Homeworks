@@ -21,13 +21,16 @@ class Portfolio(object):
 		return "Portfolio Summary: \n\tCash: $%.2f \n\tStocks: %r \n\tMutual Funds: %r" % (self.cash, self.stocks, self.mutualfunds)
 					
 	def gatherAssets(self):
+		removeStocks = []
 		for i in range(0, len(self.stocks)):
 			if self.stocks[i][0] == 0:
 				self.stocks.pop(i)
-			for j in range(1, len(self.stocks)):
+			for j in range(i+1, len(self.stocks)):
 				if self.stocks[i][1] == self.stocks[j][1]:
 					self.stocks[i][0] += self.stocks[j][0]
-					self.stocks.pop(j)
+					removeStocks.append(j)
+		for k in removeStocks[::-1]:
+			self.stocks.pop(k)
 			
 	def addCash(self, amount):
 		if isinstance(amount, float) == False and isinstance(amount, int) == False:
@@ -45,12 +48,14 @@ class Portfolio(object):
 		
 	def getCash(self):
 		return self.cash
-	
+
 	def buyAsset(self, quantity, asset):
 		if quantity <= 0:
 			print "Invalid transaction."
 		elif isinstance(quantity, int) == False and isinstance(asset, Stock) == True:
 			print "Invalid transaction. Stocks must be sold whole."
+		elif self.cash < asset.getPrice() * quantity:
+			print "Invalid transaction. Not enough cash."
 		else:
 			self.cash -= asset.getPrice() * quantity
 			if isinstance(asset, Stock) == True:
@@ -59,13 +64,9 @@ class Portfolio(object):
 			elif isinstance(asset, MutualFund):
 				asset_type = 'Mutual funds'
 				self.mutualfunds.append([quantity, asset.getSymbol()])
-			if quantity == 1:
-				multiple = ''
-			else:
-				multiple = 's'
-			log_entry = "%s purchased: %r share%s of %s at $%.2f per share" % (asset_type, quantity, multiple, asset.getSymbol(), asset.getPrice())
+			log_entry = "%s purchased: %r share(s) of %s at $%.2f per share" % (asset_type, quantity, asset.getSymbol(), asset.getPrice())
 			self.log.append(log_entry)
-			self.gatherAssets()
+		self.gatherAssets()
 	
 	def buyStock(self, quantity, asset):
 		self.buyAsset(quantity, asset)
@@ -79,6 +80,10 @@ class Portfolio(object):
 			print "Invalid transaction."
 		else: 
 			# Check if client owns shares of asset
+			if not self.stocks:
+				self.stocks.append([0, 'EMPTY'])
+			if not self.mutualfunds:
+				self.mutualfunds.append([0, 'EMPTY'])
 			if not(asset.getSymbol() in zip(*self.stocks)[1] or asset.getSymbol() in zip(*self.mutualfunds)[1]):
 				print "Invalid transaction. No shares of %s owned." % asset.getSymbol()
 			# Check if clients owns enough shares
@@ -135,12 +140,21 @@ class MutualFund(Asset):
 		self.price = 1
 
 p = Portfolio('folio')
-p.addCash(500000)
+p.addCash(50000)
 s = Stock(100, 'HAL')
+s2 = Stock(50, 'BAR')
 m = MutualFund('MAR')
 p.buyAsset(2, s)
-p.buyAsset(3, s)
-p.buyAsset(3.1, m)
-p.sellAsset(2, m)
 print p
-p.history()
+p.buyAsset(15, s2)
+print p
+p.buyAsset(3, s)
+print p
+p.buyAsset(3, s2)
+print p
+p.gatherAssets()
+print p
+p.buyAsset(3.1, m)
+print p
+p.sellAsset(4, s2)
+print p
