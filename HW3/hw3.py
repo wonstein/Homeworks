@@ -1,5 +1,6 @@
 import random
 import sys, time
+from matplotlib import pyplot as plt
 
 def bubble_sort(unsorted, sorted):
   #print "Unsorted array: %r" % unsorted
@@ -39,21 +40,32 @@ def simulate(n, algorithm, sims):
       random.shuffle(unsorted)
       start_time = time.time()
       bubble_sort(unsorted, sorted)
-      average_time += (time.time() - start_time)/sims
+      average_time += (time.time() - start_time)/sims * 1000
   elif algorithm == 'comb':
     for i in range(0, sims):
       random.shuffle(unsorted)
       start_time = time.time()
       comb_sort(unsorted, sorted)
-      average_time += (time.time() - start_time)/sims
-  print "Ran %s simulations, averaging %.4f seconds per sort" %(sims, average_time) 
-  return round(average_time, 4)
+      average_time += (time.time() - start_time)/sims * 1000
+  print "Ran %s simulations, averaging %.3f milliseconds per sort" %(sims, average_time) 
+  return round(average_time, 10)
   
 comb_averages = []
 bubble_averages = []
-for i in range(1, 15):
-  comb_averages.append(simulate(2**i, 'comb', 1000))
-  bubble_averages.appenD(simulate(2**i, 'bubble', 1000))
+n = range(2, 51, 5)
+for i in n:
+  comb_averages.append(simulate(i, 'comb', 1000))
+  bubble_averages.append(simulate(i, 'bubble', 1000))
 print comb_averages
 print bubble_averages
+
+plt.plot(n, bubble_averages, 'b--',  n, comb_averages, 'r--')
+plt.scatter(n, bubble_averages, marker = '.', color = 'b', label = 'Bubble Sort', s=50, facecolors='none')
+plt.scatter(n, comb_averages, marker = '.', color = 'r', label = 'Comb Sort', s=50, facecolors='none')
+plt.xlabel('Number of values to be sorted')
+plt.ylabel('Average sort time in milliseconds')
+plt.xlim(0, 50)
+plt.ylim(0, 0.5)
+plt.legend(loc='upper center')
+plt.savefig('hw3_bubble_vs_comb.png')
   
