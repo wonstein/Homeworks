@@ -61,7 +61,6 @@ class LinkedList(object):
       PriorNode.changeNext(Node(new_value, PriorNode.next))
     self.length +=1
     
-  
   # Finds particular node in linked list given an index
   def findNode(self, index):  
     current_node = self.head
@@ -70,17 +69,21 @@ class LinkedList(object):
       current_node = current_node.next
       i += 1
     return current_node
+    
+  def removeNodesByValue(self, value):
+    for i in range(self.length)[::-1]:
+      if self.findNode(i).value == value: self.removeNode(i)
       
 ll = LinkedList(1)
 print ll # 1
-ll.addNode(2)
+ll.addNode(1)
 print ll #12
-ll.addNode(3) 
+ll.addNode(1) 
 print ll # 123
-ll.addNode(4) #123
+ll.addNode(1) #123
 print ll
-ll.addNode(5)
+ll.addNode(1)
 print ll
-ll.addNodeBefore(0, 5)
+ll.removeNodesByValue(2)
 print ll
-#print ll.Node3
+print ll.length
